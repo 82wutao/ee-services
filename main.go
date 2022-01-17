@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"strconv"
 
+	"github.com/82wutao/ee-rpcdeclare/rpcx"
 	"github.com/82wutao/ee-services/interfaces"
 	"github.com/82wutao/ee-services/services"
 )
@@ -24,13 +26,12 @@ func main() {
 	}
 	proto := os.Args[3]
 
-	if err := interfaces.LaunchRpcServer(interfaces.HostPort{
+	if err := interfaces.LaunchRpcServer(context.Background(), rpcx.HostPort{
 		Host:  addr,
 		Port:  int16(port),
 		Proto: proto,
-	}, []interfaces.ServiceHandle{new(interfaces.OrderService)}); err != nil {
+	}, []rpcx.ServiceHandle{new(interfaces.OrderService)}); err != nil {
 		log.Fatalf("LaunchRpcServer error %+v\n", err)
 	}
 	log.Printf("LaunchRpcServer finished \n")
-
 }

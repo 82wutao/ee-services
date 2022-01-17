@@ -13,7 +13,7 @@ func (os *OrderService) HandleName() string {
 	return "order-service"
 }
 
-func (os *OrderService) Query(ctx context.Context, req *order.OrderQueryReq, resp *order.OrderQueryResp) error {
+func (os *OrderService) OrderQuery(ctx context.Context, req *order.OrderQueryReq, resp *order.OrderQueryResp) error {
 	cmd := services.NewCommand([]interface{}{req.UserID}, func(args []interface{}) ([]interface{}, error) {
 		userID := args[0].(int)
 		orders := services.OrderQuery(userID)
@@ -28,7 +28,7 @@ func (os *OrderService) Query(ctx context.Context, req *order.OrderQueryReq, res
 	return nil
 }
 
-func (os *OrderService) Submit(ctx context.Context, req *order.OrderSubmitReq, resp *order.OrderSubmitResp) error {
+func (os *OrderService) OrderSubmit(ctx context.Context, req *order.OrderSubmitReq, resp *order.OrderSubmitResp) error {
 	cmd := services.NewCommand([]interface{}{req.UserID}, func(args []interface{}) ([]interface{}, error) {
 		userID := args[0].(int)
 		newOrderID := services.OrderSubmit(userID, nil)
@@ -43,7 +43,7 @@ func (os *OrderService) Submit(ctx context.Context, req *order.OrderSubmitReq, r
 	resp.UserID = req.UserID
 	return nil
 }
-func (os *OrderService) Cancel(ctx context.Context, req *order.OrderCancelReq, resp *order.OrderCancelResp) error {
+func (os *OrderService) OrderCancel(ctx context.Context, req *order.OrderCancelReq, resp *order.OrderCancelResp) error {
 	cmd := services.NewCommand([]interface{}{req.UserID}, func(args []interface{}) ([]interface{}, error) {
 		userID := args[0].(int)
 		orderID := args[1].(int)

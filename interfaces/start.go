@@ -2,69 +2,29 @@ package interfaces
 
 import (
 	"context"
-	"fmt"
 	"log"
 
+	"github.com/82wutao/ee-rpcdeclare/rpcx"
 	"github.com/smallnest/rpcx/server"
 )
 
 func _onRestart(s *server.Server)  {}
 func _onShutdown(s *server.Server) {}
 
-type HostPort struct {
-	Host  string
-	Port  int16
-	Proto string // tcp/udp/http
-}
+var serv *rpcx.RPCXServer
 
-func (hp HostPort) toString() string {
-	return fmt.Sprintf("%s@%s:%d",
-		hp.Proto, hp.Host, hp.Port)
-}
-
-type ServiceHandle interface {
-	HandleName() string
-}
-
-var serv *server.Server
-
-func LaunchRpcServer(serviceHost HostPort, handles []ServiceHandle) error {
+func LaunchRpcServer(ctx context.Context, serviceHost rpcx.HostPort, handles []rpcx.ServiceHandle) error {
 
 	if serv != nil {
 		return nil
 	}
 
-	serv = server.NewServer()
-
-	// rp := serverplugin.ConsulRegisterPlugin{
-	// 	ServiceAddress: serviceHost.toString(),
-	// 	ConsulServers:  []string{""},
-	// 	BasePath:       "ee/rpc",
-	// 	Metrics:        metrics.NewRegistry(),
-	// 	UpdateInterval: time.Minute,
-	// }
-	// if err := rp.Start(); err != nil {
-	// 	log.Fatalf("regist service error %+v\n", err)
-	// 	return err
-	// }
-	// serv.Plugins.Add(rp) //consul
-	// serv.Plugins.Add(nil) //trace
-
-	serv.RegisterOnRestart(_onRestart)   // on restart
-	serv.RegisterOnShutdown(_onShutdown) // on shutdown
-
-	for _, hanle := range handles {
-		if err := serv.RegisterName(hanle.HandleName(), hanle, ""); err != nil {
-			log.Fatalf("server regist service %s error %+v\n", hanle.HandleName(), err)
-			return err
-		}
-	}
-	if err := serv.Serve(serviceHost.Proto,
-		fmt.Sprintf("%s:%d", serviceHost.Host, serviceHost.Port)); err != nil {
-		log.Fatalf("start rpcx server error %+v\n", err)
+	var err error
+	serv, err = rpcx.NewServer(serviceHost, handles, _onRestart, _onShutdown)
+	if err != nil {
 		return err
 	}
-	return nil
+	return serv.Launch(ctx)
 }
 func ShutdownRpcServer(ctx context.Context) error {
 	if serv == nil {
@@ -80,7 +40,7 @@ func RelauchRpcServer(ctx context.Context) error {
 	if serv == nil {
 		return nil
 	}
-	if err := serv.Restart(ctx); err != nil {
+	if err := serv.Relaunch(ctx); err != nil {
 		log.Fatalf("restart rpcx server error %+v\n", err)
 		return err
 	}
