@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/82wutao/ee-services/interfaces"
+	"github.com/82wutao/ee-services/services"
 )
 
 func main() {
@@ -13,6 +14,8 @@ func main() {
 		log.Fatalf("services listen_addr listen_port trans_proto\n")
 		return
 	}
+	services.Loop(100)
+
 	addr := os.Args[1]
 	port, err := strconv.Atoi(os.Args[2])
 	if err != nil {
@@ -24,8 +27,10 @@ func main() {
 	if err := interfaces.LaunchRpcServer(interfaces.HostPort{
 		Host:  addr,
 		Port:  int16(port),
-		Proto: proto, // tcp/udp/http
+		Proto: proto,
 	}, []interfaces.ServiceHandle{new(interfaces.OrderService)}); err != nil {
 		log.Fatalf("LaunchRpcServer error %+v\n", err)
 	}
+	log.Printf("LaunchRpcServer finished \n")
+
 }
