@@ -20,7 +20,10 @@ func LaunchRpcServer(ctx context.Context, serviceHost rpcx.HostPort, handles []r
 	}
 
 	var err error
-	serv, err = rpcx.NewServer(serviceHost, handles, _onRestart, _onShutdown)
+	serv, err = rpcx.NewServerAndRegisterConsul(serviceHost, handles,
+		_onRestart, _onShutdown,
+		rpcx.HostPort{Proto: "http", Host: "127.0.0.1", Port: 8500})
+	// serv, err = rpcx.NewServer()
 	if err != nil {
 		return err
 	}
