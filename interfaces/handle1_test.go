@@ -45,7 +45,7 @@ func TestOrderService_Submit(t *testing.T) {
 	}
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := os.Submit(tt.args.ctx, tt.args.req, tt.args.resp); (err != nil) != tt.wantErr {
+			if err := os.OrderSubmit(tt.args.ctx, tt.args.req, tt.args.resp); (err != nil) != tt.wantErr {
 				t.Errorf("OrderService.Submit() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.args.resp.OrderID != tt.args.req.UserID*100+i+1 {

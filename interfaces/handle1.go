@@ -2,7 +2,10 @@ package interfaces
 
 import (
 	"context"
+	"fmt"
+	"log"
 
+	"github.com/82wutao/ee-rpcdeclare/mq"
 	"github.com/82wutao/ee-rpcdeclare/order"
 	"github.com/82wutao/ee-services/services"
 )
@@ -25,7 +28,13 @@ func (os *OrderService) OrderQuery(ctx context.Context, req *order.OrderQueryReq
 	}
 	orders := cmd.Return[0].([]int)
 	resp.Orders = orders
-	return nil
+
+	suc, err := services.SendMsg(ctx, mq.MQSending{
+		Topic:   "TopicTest",
+		Content: ([]byte)(fmt.Sprintf("OrderQuery by %d", req.UserID)),
+	})
+	log.Printf("services.SendMsg %b \n", suc)
+	return err
 }
 
 func (os *OrderService) OrderSubmit(ctx context.Context, req *order.OrderSubmitReq, resp *order.OrderSubmitResp) error {

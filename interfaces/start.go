@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/82wutao/ee-rpcdeclare/network"
 	"github.com/82wutao/ee-rpcdeclare/rpcx"
 	"github.com/smallnest/rpcx/server"
 )
@@ -13,7 +14,7 @@ func _onShutdown(s *server.Server) {}
 
 var serv *rpcx.RPCXServer
 
-func LaunchRpcServer(ctx context.Context, serviceHost rpcx.HostPort, handles []rpcx.ServiceHandle) error {
+func LaunchRpcServer(ctx context.Context, serviceHost network.HostPort, handles []rpcx.ServiceHandle) error {
 
 	if serv != nil {
 		return nil
@@ -22,7 +23,7 @@ func LaunchRpcServer(ctx context.Context, serviceHost rpcx.HostPort, handles []r
 	var err error
 	serv, err = rpcx.NewServerAndRegisterConsul(serviceHost, handles,
 		_onRestart, _onShutdown,
-		rpcx.HostPort{Proto: "http", Host: "127.0.0.1", Port: 8500})
+		network.HostPort{Proto: "http", Host: "127.0.0.1", Port: 8500})
 	// serv, err = rpcx.NewServer()
 	if err != nil {
 		return err
